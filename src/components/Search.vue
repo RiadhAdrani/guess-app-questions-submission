@@ -1,16 +1,22 @@
 <template>
      <div class="container border border-light round p-5 d-flex flex-column justify-content-center">
-          <h3 class="text-light mb-4">Search for a question</h3>
+          <h3 class="text-light mb-1">Search for a question</h3>
+          <button type="button" class="btn btn-dark">
+               There are only
+               <span class="badge bg-secondary mt-1 mx-1"> {{ list.length }} questions </span> in
+               our Database !
+          </button>
+
           <input
                type="search"
-               class="form-control"
+               class="form-control mt-3"
                placeholder="Search..."
                aria-label="Search"
                v-model="filter"
           />
 
           <div class="container mt-4">
-               <ul class="list-group" v-for="e in filteredList" :key="e.statement">
+               <ul class="list-group" v-for="e in filteredList.slice(0, 5)" :key="e.statement">
                     <li
                          class="list-group-item mt-2 bg-secondary text-light d-flex flex-sm-row flex-column justify-content-between"
                     >
@@ -39,6 +45,7 @@ export default {
           return {
                list: [],
                filter: "",
+               displayNumber: 5,
           };
      },
      created: function() {
@@ -65,7 +72,13 @@ export default {
                     if (e["statement"].toLowerCase().includes(this.filter.toLowerCase())) l.push(e);
                });
 
-               return l.slice(0, 2);
+               const final = [];
+               for (let x = 0; x < this.displayNumber; x++) {
+                    if (l.length < x) break;
+                    else final.push(l[x]);
+               }
+
+               return l;
           },
      },
 };

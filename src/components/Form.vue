@@ -9,6 +9,7 @@
                          type="text"
                          v-model="question.statement"
                          class="form-control"
+                         placeholder="things that you like."
                          aria-describedby="basic-addon3"
                     />
                </div>
@@ -61,14 +62,14 @@
                </div>
                <button
                     type="button"
-                    class="btn btn-primary d-inline align-self-center"
+                    class="btn btn-primary d-inline align-self-center px-5"
                     v-on:click="addAnswer()"
                >
                     Add
                </button>
                <button
                     type="button"
-                    class="btn btn-danger d-inline align-self-center mt-2"
+                    class="btn btn-secondary d-inline align-self-center mt-2 px-5"
                     v-on:click="resetAnswers()"
                >
                     Reset Answers
@@ -82,11 +83,14 @@
           </p>
           <div class="d-flex flex-column ">
                <button
-                    class="btn btn-success d-inline align-self-center"
+                    class="btn btn-success d-inline align-self-center px-5"
                     v-on:click="sendQuestion()"
                >
                     Submit
                </button>
+               <div class="alert alert-success mt-3 align-self-center" id="success" role="alert">
+                    Question submitted successfully! Thank you for contributing!
+               </div>
                <div class="alert alert-danger mt-3 align-self-center" id="warning" role="alert">
                     {{ warning }}
                </div>
@@ -167,8 +171,16 @@ export default {
           showAlert() {
                document.getElementById("warning").style.display = "inline";
           },
+          hideSuccess() {
+               document.getElementById("success").style.display = "none";
+          },
+          showSuccess() {
+               document.getElementById("success").style.display = "inline";
+          },
           sendQuestion() {
                this.hideAlert();
+               this.hideSuccess();
+
                const q = this.$data.question;
 
                q.statement = q.statement.trim();
@@ -212,7 +224,8 @@ export default {
                db.collection("questions")
                     .add(this.question)
                     .then(() => {
-                         confirm("Question was submitted Successfully :)");
+                         // confirm("Question was submitted Successfully :)");
+                         this.showSuccess();
                          this.question = {
                               statement: "",
                               topic: this.question.topic,
@@ -238,6 +251,10 @@ export default {
 
 <style>
 #warning {
+     display: none;
+}
+
+#success {
      display: none;
 }
 </style>
