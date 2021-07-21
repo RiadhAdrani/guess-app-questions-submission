@@ -5,10 +5,17 @@
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width,initial-scale=1.0" />
           <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
+          <title>Submit Your Question</title>
           <link
                rel="stylesheet"
                href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
                integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+               crossorigin="anonymous"
+          />
+          <link
+               href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+               rel="stylesheet"
+               integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
                crossorigin="anonymous"
           />
           <title><%= htmlWebpackPlugin.options.title %></title>
@@ -35,25 +42,12 @@
                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
                crossorigin="anonymous"
           ></script>
-          <!-- The core Firebase JS SDK is always required and must be listed first -->
-          <script src="https://www.gstatic.com/firebasejs/8.7.1/firebase-app.js"></script>
+          <script
+               src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+               integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+               crossorigin="anonymous"
+          ></script>
 
-          <!-- TODO: Add SDKs for Firebase products that you want to use
-     https://firebase.google.com/docs/web/setup#available-libraries -->
-
-          <script>
-               // Your web app's Firebase configuration
-               const firebaseConfig = {
-                    apiKey: "AIzaSyCdvmEo6JXbPtdnTMCHc_lBCMNiivKZUO8",
-                    authDomain: "questions-submission.firebaseapp.com",
-                    projectId: "questions-submission",
-                    storageBucket: "questions-submission.appspot.com",
-                    messagingSenderId: "902604205688",
-                    appId: "1:902604205688:web:ff1ddadcb6637ea1f5878d",
-               };
-               // Initialize Firebase
-               firebase.initializeApp(firebaseConfig);
-          </script>
           <div id="app"></div>
           <!-- built files will be auto injected -->
      </body>

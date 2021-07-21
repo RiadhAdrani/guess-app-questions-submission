@@ -45,8 +45,7 @@
                     <input
                          type="text"
                          v-model="answer.answer"
-                         class="form-control p-3 mb-1 mr-3"
-                         id="floatingInput"
+                         class="form-control p-3 mb-1 mr-3 my-auto"
                          placeholder="Answer..."
                     />
                     <select
@@ -60,9 +59,38 @@
                          <option value="5"> 5</option>
                     </select>
                </div>
+               <button
+                    type="button"
+                    class="btn btn-primary d-inline align-self-center"
+                    v-on:click="addAnswer()"
+               >
+                    Add
+               </button>
+               <button
+                    type="button"
+                    class="btn btn-danger d-inline align-self-center mt-2"
+                    v-on:click="resetAnswers()"
+               >
+                    Reset Answers
+               </button>
           </div>
 
-          <button class="btn btn-light" v-on:click="sendQuestion()">Submit</button>
+          <p class="text-light">
+               Before submitting, make sure that your question does not exist already in the
+               database. <br />
+               In The Future we will be adding a feature to detect similarity for submissions.
+          </p>
+          <div class="d-flex flex-column ">
+               <button
+                    class="btn btn-success d-inline align-self-center"
+                    v-on:click="sendQuestion()"
+               >
+                    Submit
+               </button>
+               <div class="alert alert-danger mt-3 align-self-center" id="warning" role="alert">
+                    {{ warning }}
+               </div>
+          </div>
      </div>
 </template>
 
@@ -73,6 +101,7 @@ export default {
      name: "Form",
      data() {
           return {
+               warning: "",
                languages: ["English", "Arabic", "French"],
                topics: [
                     "Gaming",
@@ -115,14 +144,43 @@ export default {
           };
      },
      methods: {
+          addAnswer() {
+               this.question.answers.push({ answer: "", points: 1 });
+          },
+          resetAnswers() {
+               this.question.answers = [
+                    { answer: "", points: 1 },
+                    { answer: "", points: 1 },
+                    { answer: "", points: 1 },
+                    { answer: "", points: 1 },
+                    { answer: "", points: 1 },
+                    { answer: "", points: 1 },
+                    { answer: "", points: 1 },
+                    { answer: "", points: 1 },
+                    { answer: "", points: 1 },
+                    { answer: "", points: 1 },
+               ];
+          },
+          hideAlert() {
+               document.getElementById("warning").style.display = "none";
+          },
+          showAlert() {
+               document.getElementById("warning").style.display = "inline";
+          },
           sendQuestion() {
+               this.hideAlert();
                const q = this.$data.question;
+
+               q.statement = q.statement.trim();
+
                for (let a = 0; a < q.answers.length; a++) {
-                    q.answers[a].answer.trim();
+                    q.answers[a].answer = q.answers[a].answer.trim();
                }
 
                if (!q.statement.trim()) {
-                    alert("Question is empty or too short!");
+                    // alert("Question is empty or too short!");
+                    this.warning = "Question is empty or too short!";
+                    this.showAlert();
                     return;
                }
 
@@ -130,13 +188,17 @@ export default {
 
                for (let x = 0; x < answers.length; x++) {
                     if (answers[x].answer.trim().length < 2) {
-                         alert("Answer cannot be empty or too short!");
+                         // alert("Answer cannot be empty or too short!");
+                         this.warning = "Answer cannot be empty or too short!";
+                         this.showAlert();
                          return;
                     }
 
                     for (let y = 0; y < answers.length; y++) {
                          if (x !== y && answers[x].answer.trim() === answers[y].answer.trim()) {
-                              alert("Cannot have duplicate answers!");
+                              // alert("Cannot have duplicate answers!");
+                              this.warning = "Cannot have duplicate answers";
+                              this.showAlert();
                               return;
                          }
                     }
@@ -147,12 +209,35 @@ export default {
                     finalAnswers.push({ answer: answers[x].answer, points: answers[x].points });
                }
 
-               db.collection("Hello")
+               db.collection("questions")
                     .add(this.question)
                     .then(() => {
-                         confirm("YES");
+                         confirm("Question was submitted Successfully :)");
+                         this.question = {
+                              statement: "",
+                              topic: this.question.topic,
+                              language: this.question.language,
+                              answers: [
+                                   { answer: "", points: 1 },
+                                   { answer: "", points: 1 },
+                                   { answer: "", points: 1 },
+                                   { answer: "", points: 1 },
+                                   { answer: "", points: 1 },
+                                   { answer: "", points: 1 },
+                                   { answer: "", points: 1 },
+                                   { answer: "", points: 1 },
+                                   { answer: "", points: 1 },
+                                   { answer: "", points: 1 },
+                              ],
+                         };
                     });
           },
      },
 };
 </script>
+
+<style>
+#warning {
+     display: none;
+}
+</style>

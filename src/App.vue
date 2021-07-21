@@ -2,17 +2,20 @@
      <div class="bg-dark main pt-5">
           <img src="../src/assets/logo_solid.png" class="circular-img mb-5" />
           <Form />
-          <p class="text-light">Thank you for contributing!</p>
+          <Search />
+          <p class="text-light mt-3">Thank you for contributing!</p>
      </div>
 </template>
 
 <script>
 import Form from "./components/Form.vue";
+import Search from "./components/Search.vue";
 
 export default {
      name: "App",
      components: {
           Form,
+          Search,
      },
 };
 </script>
