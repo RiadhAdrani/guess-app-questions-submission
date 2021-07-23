@@ -1,17 +1,17 @@
 <template>
      <div class="bg-dark main pt-5">
-          <img src="../src/assets/logo_solid.png" class="circular-img mb-5" />
-          <NavBar />
-          <router-view />
+          <Form />
+          <Search />
+          <p class="text-light mt-3">Thank you for contributing!</p>
      </div>
 </template>
 
 <script>
-import NavBar from "./components/NavBar.vue";
+import Form from "./Form.vue";
+import Search from "./Search.vue";
 
 export default {
-     name: "App",
-     components: { NavBar },
+     components: { Form, Search },
 };
 </script>
 
