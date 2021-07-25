@@ -1,7 +1,7 @@
 <template>
      <div class="bg-dark main pt-5">
           <Header />
-          <NavBar />
+          <NavBar :homeData="{ db }" :dashboardData="{ db }" :aboutData="{}" />
           <router-view />
           <Footer />
      </div>
@@ -11,15 +11,36 @@
 import NavBar from "./components/NavBar.vue";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
+import db from "./Firebase";
 
 export default {
      name: "App",
      components: { NavBar, Header, Footer },
      data() {
-          return {};
+          return {
+               database: db,
+               list: [],
+               user: {},
+          };
      },
      created: function() {
-          this.$router.push({ name: "Submit", query: { redirect: "/" } });
+          db.collection("questions").onSnapshot((res) => {
+               const changes = res.docChanges();
+
+               changes.forEach((change) => {
+                    if (change.type === "added") {
+                         this.list.push({
+                              ...change.doc.data(),
+                              id: change.doc.id,
+                         });
+                    }
+               });
+               this.$router.push({
+                    name: "Submit",
+                    query: { redirect: "/" },
+                    params: { list: this.list },
+               });
+          });
      },
 };
 </script>

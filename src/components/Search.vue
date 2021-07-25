@@ -38,9 +38,11 @@
 
 <script>
 import db from "../Firebase";
+// import QuestionCard from "../components/basic-components/QuestionCard.vue";
 
 export default {
      name: "Search",
+     components: {},
      data() {
           return {
                list: [],

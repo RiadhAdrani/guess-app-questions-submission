@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import SearchEdit from "../src/components/SearchEdit.vue";
+import SearchEdit from "../components/SearchEdit.vue";
 
 export default {
      name: "Dashboard",

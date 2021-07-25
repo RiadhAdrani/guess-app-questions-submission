@@ -1,8 +1,8 @@
 import { createWebHistory, createRouter } from "vue-router";
-import Submit from "../../views/Submit.vue";
-import Dashboard from "../../views/Dashboard.vue";
-import About from "../../views/About.vue";
-import Login from "../../views/Login.vue";
+import Submit from "../views/Submit.vue";
+import Dashboard from "../views/Dashboard.vue";
+import About from "../views/About.vue";
+import Login from "../views/Login.vue";
 
 const routes = [
      {

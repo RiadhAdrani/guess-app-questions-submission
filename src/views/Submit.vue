@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import Form from "../src/components/Form.vue";
-import Search from "../src/components/Search.vue";
+import Form from "../components/Form.vue";
+import Search from "../components/Search.vue";
 
 export default {
      components: { Form, Search },

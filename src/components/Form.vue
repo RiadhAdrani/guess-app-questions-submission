@@ -39,31 +39,9 @@
           <div class="form-floating d-flex flex-column justify-content-center mb-3">
                <h3 class="text-light">Answers</h3>
                <p class="text-light">At least 10 answers should be provided</p>
-               <div
-                    v-for="answer in question.answers"
-                    :key="answer"
-                    class="col-12 w-75 mb-md-2 mb-4 align-self-center d-flex flex-column flex-md-row"
-               >
-                    <input
-                         type="text"
-                         v-model="answer.answer"
-                         class="form-control p-3 mb-2 mr-3 my-auto responsiveAnswer"
-                         placeholder="Answer..."
-                    />
-                    <div class="d-flex flex-row my-auto px-0 col-md-4 col-12">
-                         <p class="text-light my-auto ml-auto mr-2 ">Points:</p>
-                         <select
-                              v-model="answer.points"
-                              class="form-select d-inline-flex"
-                              aria-label="Default select example"
-                         >
-                              <option value="-5"> -5</option>
-                              <option selected value="1"> 1</option>
-                              <option value="2"> 2</option>
-                              <option value="5"> 5</option>
-                         </select>
-                    </div>
-               </div>
+
+               <EditAnswer :answers="question.answers" />
+
                <div class="d-flex flex-row justify-content-center">
                     <button
                          type="button"
@@ -114,9 +92,11 @@
 
 <script>
 import db from "../Firebase";
+import EditAnswer from "./basic-components/EditAnswers.vue";
 
 export default {
      name: "Form",
+     components: { EditAnswer },
      data() {
           return {
                warning: "",
@@ -178,6 +158,8 @@ export default {
                document.getElementById("success").style.display = "inline";
           },
           sendQuestion() {
+               console.log(this.question.topic);
+
                if (this.submitting) {
                     console.log("a request has already been sent, please wait !");
                     return;

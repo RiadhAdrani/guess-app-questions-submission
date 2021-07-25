@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import db from "../src/Firebase";
+import db from "../Firebase";
 
 export default {
      name: "Login",
