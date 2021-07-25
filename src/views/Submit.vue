@@ -2,7 +2,6 @@
      <div class="bg-dark main pt-5">
           <Form />
           <Search />
-          <p class="text-light mt-3">Thank you for contributing!</p>
      </div>
 </template>
 
@@ -11,7 +10,13 @@ import Form from "../components/Form.vue";
 import Search from "../components/Search.vue";
 
 export default {
+     name: "Submit",
      components: { Form, Search },
+     props: {},
+     data() {
+          return {};
+     },
+     created() {},
 };
 </script>
 

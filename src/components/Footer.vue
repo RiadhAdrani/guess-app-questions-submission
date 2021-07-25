@@ -1,5 +1,5 @@
 <template>
-     <div class="text-light d-flex justify-content-center py-2">
+     <div class="text-light d-flex justify-content-center py-2 my-4">
           <a
                href="https://github.com/RiadhAdrani/guess-app-questions-submission"
                class="text-decoration-none d-flex flex-row"

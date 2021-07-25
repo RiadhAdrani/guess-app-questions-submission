@@ -16,36 +16,28 @@
           />
 
           <div class="container mt-4">
-               <ul class="list-group" v-for="e in filteredList.slice(0, 10)" :key="e.statement">
-                    <li
-                         class="list-group-item mt-2 bg-secondary text-light d-flex flex-sm-row flex-column justify-content-between"
-                    >
-                         <p class="text-center text-sm-start my-auto">Name 10 {{ e.statement }}</p>
-                         <p class="d-flex flex-column flex-sm-row my-auto justify-content-end ml-2">
-                              <span
-                                   class="input-group-text w-100 bg-light text-dark m-1 align-self-center"
-                                   >{{ e.answers.length }}</span
-                              ><span
-                                   class="input-group-text w-100 bg-light text-dark m-1 align-self-center"
-                                   >{{ e.topic }}</span
-                              >
-                         </p>
-                    </li>
-               </ul>
+               <QuestionCard
+                    :question="e"
+                    v-for="e in filteredList.slice(0, 5)"
+                    :key="e.statement"
+               />
           </div>
      </div>
 </template>
 
 <script>
 import db from "../Firebase";
-// import QuestionCard from "../components/basic-components/QuestionCard.vue";
+import QuestionCard from "../components/basic-components/QuestionCard.vue";
 
 export default {
      name: "Search",
-     components: {},
+     components: { QuestionCard },
+     props: {
+          questions: Array,
+     },
      data() {
           return {
-               list: [],
+               list: [{ statement: "", topic: "", language: "", answers: [{}], id: "" }],
                filter: "",
                displayNumber: 5,
           };
@@ -53,6 +45,8 @@ export default {
      created: function() {
           db.collection("questions").onSnapshot((res) => {
                const changes = res.docChanges();
+
+               this.list.pop();
 
                changes.forEach((change) => {
                     if (change.type === "added") {

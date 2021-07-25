@@ -18,7 +18,6 @@ export default {
      components: { NavBar, Header, Footer },
      data() {
           return {
-               database: db,
                list: [],
                user: {},
           };
@@ -35,10 +34,10 @@ export default {
                          });
                     }
                });
+
                this.$router.push({
                     name: "Submit",
                     query: { redirect: "/" },
-                    params: { list: this.list },
                });
           });
      },

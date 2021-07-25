@@ -3,14 +3,14 @@
           <li
                class="list-group-item mt-2 bg-secondary text-light d-flex flex-sm-row flex-column justify-content-between"
           >
-               <p class="text-center text-sm-start my-auto">Name 10 {{ question.statement }}</p>
+               <p class="text-center text-sm-start my-auto">Name 10 {{ element.statement }}</p>
                <p class="d-flex flex-column flex-sm-row my-auto justify-content-end ml-2">
                     <span class="input-group-text w-100 bg-light text-dark m-1 align-self-center">{{
-                         question.answers.length
+                         element.answers.length
                     }}</span
                     ><span
                          class="input-group-text w-100 bg-light text-dark m-1 align-self-center"
-                         >{{ question.topic }}</span
+                         >{{ element.topic }}</span
                     >
                </p>
           </li>
@@ -23,8 +23,13 @@ export default {
      props: {
           question: Object,
      },
+     data() {
+          return {
+               element: {},
+          };
+     },
      created() {
-          console.log(this.question);
+          this.element = this.question;
      },
 };
 </script>
