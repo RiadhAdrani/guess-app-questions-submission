@@ -37,7 +37,7 @@ export default {
      },
      data() {
           return {
-               list: [{ statement: "", topic: "", language: "", answers: [{}], id: "" }],
+               list: [],
                filter: "",
                displayNumber: 5,
           };
@@ -45,8 +45,6 @@ export default {
      created: function() {
           db.collection("questions").onSnapshot((res) => {
                const changes = res.docChanges();
-
-               this.list.pop();
 
                changes.forEach((change) => {
                     if (change.type === "added") {
