@@ -16,7 +16,7 @@
           />
 
           <div class="container mt-4">
-               <ul class="list-group" v-for="e in filteredList.slice(0, 5)" :key="e.statement">
+               <ul class="list-group" v-for="e in filteredList.slice(0, 10)" :key="e.statement">
                     <li
                          class="list-group-item mt-2 bg-secondary text-light d-flex flex-sm-row flex-column justify-content-between"
                     >

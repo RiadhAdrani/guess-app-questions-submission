@@ -1,7 +1,8 @@
 import { createWebHistory, createRouter } from "vue-router";
-import Submit from "../components/Submit.vue";
-import Dashboard from "../components/Dashboard.vue";
-import About from "../components/About.vue";
+import Submit from "../../views/Submit.vue";
+import Dashboard from "../../views/Dashboard.vue";
+import About from "../../views/About.vue";
+import Login from "../../views/Login.vue";
 
 const routes = [
      {
@@ -10,19 +11,25 @@ const routes = [
           component: Submit,
      },
      {
-          path: "/dashboard",
+          path: "/login",
+          name: "Login",
+          component: Login,
+     },
+     {
+          path: "/dashboard/",
           name: "Dashboard",
           component: Dashboard,
      },
      {
-          path: "/about",
+          path: "/about/",
           name: "About",
           component: About,
      },
 ];
 
 const router = createRouter({
-     history: createWebHistory(),
+     history: createWebHistory(process.env.BASE_URL),
+     base: "/",
      routes,
 });
 

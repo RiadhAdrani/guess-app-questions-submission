@@ -12,6 +12,12 @@ import NavBar from "./components/NavBar.vue";
 export default {
      name: "App",
      components: { NavBar },
+     data() {
+          return {};
+     },
+     created: function() {
+          this.$router.push({ name: "Submit", query: { redirect: "/" } });
+     },
 };
 </script>
 
