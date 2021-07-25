@@ -1,17 +1,20 @@
 <template>
      <div class="bg-dark main pt-5">
-          <img src="../src/assets/logo_solid.png" class="circular-img mb-5" />
+          <Header />
           <NavBar />
           <router-view />
+          <Footer />
      </div>
 </template>
 
 <script>
 import NavBar from "./components/NavBar.vue";
+import Header from "./components/Header.vue";
+import Footer from "./components/Footer.vue";
 
 export default {
      name: "App",
-     components: { NavBar },
+     components: { NavBar, Header, Footer },
      data() {
           return {};
      },
@@ -32,7 +35,8 @@ export default {
 }
 
 #app {
-     font-family: Avenir, Helvetica, Arial, sans-serif;
+     font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans", Arial,
+          sans-serif;
      -webkit-font-smoothing: antialiased;
      -moz-osx-font-smoothing: grayscale;
      text-align: center;
