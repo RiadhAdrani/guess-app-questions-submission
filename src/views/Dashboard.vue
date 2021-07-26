@@ -1,6 +1,6 @@
 <template>
      <div
-          class="container border border-light d-flex flex-column col-md-10 col-12 text-light rounded mt-5 px-5 pt-4"
+          class="container border border-light d-flex flex-column col-md-10 col-12 text-light rounded mt-5 px-5 pt-4 pb-4"
      >
           <h2 class="text-light">Dashboard</h2>
           <div class="">

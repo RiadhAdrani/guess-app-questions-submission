@@ -76,6 +76,7 @@
           <div class="d-flex flex-column ">
                <button
                     class="btn btn-success d-inline align-self-center px-5"
+                    id="send-btn"
                     v-on:click="sendQuestion()"
                >
                     Submit
@@ -159,10 +160,10 @@ export default {
                document.getElementById("success").style.display = "inline";
           },
           sendQuestion() {
-               console.log(this.question.topic);
-
+               document.getElementById("send-btn").disabled = true;
                if (this.submitting) {
                     console.log("a request has already been sent, please wait !");
+                    document.getElementById("send-btn").disabled = false;
                     return;
                }
 
@@ -180,6 +181,7 @@ export default {
                if (!q.statement.trim()) {
                     this.warning = "Question is empty or too short!";
                     this.showAlert();
+                    document.getElementById("send-btn").disabled = false;
                     return;
                }
 
@@ -189,6 +191,7 @@ export default {
                     if (answers[x].answer.trim().length < 2) {
                          this.warning = "Answer cannot be empty or too short!";
                          this.showAlert();
+                         document.getElementById("send-btn").disabled = false;
                          return;
                     }
 
@@ -196,6 +199,7 @@ export default {
                          if (x !== y && answers[x].answer.trim() === answers[y].answer.trim()) {
                               this.warning = "Cannot have duplicate answers";
                               this.showAlert();
+                              document.getElementById("send-btn").disabled = false;
                               return;
                          }
                     }
@@ -234,6 +238,7 @@ export default {
                                    { answer: "", points: 1 },
                               ],
                          };
+                         document.getElementById("send-btn").disabled = false;
                     });
           },
      },

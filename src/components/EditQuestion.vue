@@ -3,10 +3,13 @@
           <div class="d-inline-flex flex-md-row flex-column">
                <span
                     class="input-group-text bg-primary btn text-light m-1 align-self-center text-break overflow-hidden"
-                    >ID : {{ update.id }}</span
+                    >Editing : {{ update.id }}</span
                >
-               <button class="btn btn-success py-1 px-3 mx-md-3 my-2 mx-0">
+               <button class="btn btn-success py-1 px-3 mx-md-3 my-2 mx-0" @click="save">
                     Save
+               </button>
+               <button class="btn btn-danger py-1 px-3 mx-md-3 my-2 mx-0" @click="del">
+                    Delete
                </button>
                <button class="btn btn-secondary py-1 px-3 mx-md-3 my-2 mx-0" @click="cancel">
                     Cancel
@@ -94,7 +97,6 @@ export default {
      methods: {
           add() {
                this.$emit("add");
-               console.log("add");
           },
           remove() {
                this.$emit("remove");
@@ -108,13 +110,16 @@ export default {
           cancel() {
                this.$emit("cancel");
           },
+          del() {
+               this.$emit("delete");
+          },
      },
      computed: {
           update() {
                return this.question;
           },
      },
-     emits: ["add", "remove", "reset", "save", "cancel"],
+     emits: ["add", "remove", "reset", "save", "cancel", "delete"],
 };
 </script>
 

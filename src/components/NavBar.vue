@@ -10,7 +10,7 @@
                class="btn btn-dark nav-bar-btn p-3 border-light mx-md-3 mx-auto my-2"
                v-on:click="goDashboard()"
           >
-               Control Room
+               Dashboard
           </button>
           <button
                class="btn btn-dark nav-bar-btn p-3 border-light mx-md-3 mx-auto my-2"
@@ -18,7 +18,6 @@
           >
                About The App
           </button>
-          <router-link to="/dashboard">Dashboard</router-link>
      </div>
 </template>
 
