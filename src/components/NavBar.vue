@@ -18,6 +18,7 @@
           >
                About The App
           </button>
+          <router-link to="/dashboard">Dashboard</router-link>
      </div>
 </template>
 

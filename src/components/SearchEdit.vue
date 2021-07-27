@@ -68,9 +68,9 @@
 </template>
 
 <script>
-import db from "../Firebase";
 import QuestionCardEdit from "../components/basic-components/QuestionCardEdit.vue";
 import EditQuestion from "../components/EditQuestion.vue";
+import Question from "../models/Question";
 
 export default {
      name: "SearchEdit",
@@ -84,46 +84,23 @@ export default {
                topics: [],
                editMode: false,
                languages: [],
-               eID: "",
-               question: {
-                    statement: "NA",
-                    topic: "NA",
-                    id: "NA",
-                    answers: [
-                         { answer: "NA", points: "NA" },
-                         { answer: "NA", points: "NA" },
-                    ],
-               },
+               //eID: "",
+               question: new Question({}),
           };
      },
      created: function() {
-          db.collection("questions").onSnapshot((res) => {
-               const changes = res.docChanges();
-
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         this.list.push({
-                              ...change.doc.data(),
-                              id: change.doc.id,
-                         });
-
-                         this.eID = this.list[0].id;
-                    }
-               });
+          Question.retrieveList({
+               onSuccess: (data) => {
+                    this.list = data;
+                    // this.eID = this.list[0].id;
+               },
           });
 
-          db.collection("param").onSnapshot((snapshot) => {
-               const changes = snapshot.docChanges();
-
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         const data = { ...change.doc.data() };
-
-                         this.topics = [...data.topics].sort((a, b) => a.localeCompare(b));
-
-                         this.languages = data.languages;
-                    }
-               });
+          Question.retrieveData({
+               onSuccess: (param) => {
+                    this.topics = [...param.topics].sort((a, b) => a.localeCompare(b));
+                    this.languages = param.languages;
+               },
           });
      },
      computed: {
@@ -144,7 +121,7 @@ export default {
           getQuestionIndexById(id) {
                for (let e in this.list) {
                     if (this.list[e].id === id) {
-                         this.eID = id;
+                         // this.eID = id;
                          return e;
                     }
                }
@@ -161,59 +138,43 @@ export default {
           EditQuestion(id) {
                if (this.getQuestionIndexById(id) !== -1) {
                     const q = this.list[this.getQuestionIndexById(id)];
-                    this.question = JSON.parse(JSON.stringify(q));
+                    this.question = Question.fromJSON(q);
                     this.EnterEditMode();
                } else {
                     alert("An Error Occured...");
                }
           },
           removeAnswer: function() {
-               if (this.question.answers.length > 10) {
-                    this.question.answers.pop();
-               }
+               this.question.removeAnswer();
           },
           addAnswer: function() {
-               this.question.answers.push({ answer: "", points: 1 });
+               this.question.addAnswer();
           },
           resetAnswers: function() {
-               this.question.answers = [
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-               ];
+               this.question.resetAnswers;
           },
           cancel() {
                this.ExitEditMode();
           },
           save() {
-               db.collection("questions")
-                    .doc(this.question.id)
-                    .update({
-                         ...this.question,
-                    })
-                    .then(() => {
+               this.question.save({
+                    onSuccess: () => {
                          this.ExitEditMode();
                          alert("Question Updated!");
-                    });
+                    },
+               });
           },
           deleteQuestion() {
-               if (confirm("Are you sure you want to delete this question?"))
-                    db.collection("questions")
-                         .doc(this.question.id)
-                         .delete()
-                         .then(() => {
+               if (confirm("Are you sure you want to delete this question?")) {
+                    this.question.wipe({
+                         onSuccess: () => {
                               this.ExitEditMode();
-                         })
-                         .catch((e) => {
+                         },
+                         onFailure: (e) => {
                               alert("Error deleting Question: ", e);
-                         });
+                         },
+                    });
+               }
           },
           Redirect() {
                this.$router.push({ name: "Dashboard", query: { redirect: "/dashboard/" } });

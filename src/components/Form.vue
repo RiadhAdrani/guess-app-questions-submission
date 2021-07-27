@@ -92,65 +92,43 @@
 </template>
 
 <script>
-import db from "../Firebase";
 import EditAnswer from "./basic-components/EditAnswers.vue";
-// import Question from "../models/Question"
+import Question from "../models/Question";
 
 export default {
      name: "Form",
      components: { EditAnswer },
+     props: { questions: Array },
+     computed: {
+          getQuestions() {
+               return this.questions;
+          },
+     },
      data() {
           return {
                warning: "",
                languages: [],
                submitting: false,
                topics: [],
-               question: {
-                    statement: "",
-                    topic: "",
-                    language: "",
-                    answers: [
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                    ],
-               },
+               question: new Question({}),
           };
      },
      methods: {
           removeAnswer() {
-               if (this.question.answers.length > 10) {
-                    this.question.answers.pop();
-               }
+               this.question.removeAnswer();
           },
           addAnswer() {
-               this.question.answers.push({ answer: "", points: 1 });
+               this.question.addAnswer();
           },
           resetAnswers() {
-               this.question.answers = [
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-               ];
+               this.question.resetAnswers();
           },
           hideAlert() {
                document.getElementById("warning").style.display = "none";
           },
-          showAlert() {
+          showAlert(warning) {
+               this.warning = warning;
+               this.submitting = false;
                document.getElementById("warning").style.display = "inline";
           },
           hideSuccess() {
@@ -160,103 +138,56 @@ export default {
                document.getElementById("success").style.display = "inline";
           },
           sendQuestion() {
-               document.getElementById("send-btn").disabled = true;
-               if (this.submitting) {
-                    console.log("a request has already been sent, please wait !");
-                    document.getElementById("send-btn").disabled = false;
-                    return;
-               }
+               if (this.submitting) return;
 
                this.hideAlert();
                this.hideSuccess();
 
-               const q = this.$data.question;
-
-               q.statement = q.statement.trim();
-
-               for (let a = 0; a < q.answers.length; a++) {
-                    q.answers[a].answer = q.answers[a].answer.trim();
-               }
-
-               if (!q.statement.trim()) {
-                    this.warning = "Question is empty or too short!";
-                    this.showAlert();
-                    document.getElementById("send-btn").disabled = false;
-                    return;
-               }
-
-               const answers = q.answers;
-
-               for (let x = 0; x < answers.length; x++) {
-                    if (answers[x].answer.trim().length < 2) {
-                         this.warning = "Answer cannot be empty or too short!";
-                         this.showAlert();
-                         document.getElementById("send-btn").disabled = false;
+               switch (this.question.verify(this.questions)) {
+                    case Question.DUPLICATE:
+                         this.showAlert("Question Already exists!");
                          return;
-                    }
-
-                    for (let y = 0; y < answers.length; y++) {
-                         if (x !== y && answers[x].answer.trim() === answers[y].answer.trim()) {
-                              this.warning = "Cannot have duplicate answers";
-                              this.showAlert();
-                              document.getElementById("send-btn").disabled = false;
-                              return;
-                         }
-                    }
+                    case Question.SHORT_STATEMENT:
+                         this.showAlert("Question is too short or empty!");
+                         return;
+                    case Question.SHORT_ANSWER:
+                         this.showAlert("An answer is too short or empty!");
+                         return;
+                    case Question.DUPLICATE_ANSWER:
+                         this.showAlert("No duplicate answers are allowed!");
+                         return;
+                    case Question.GOOD:
+                         break;
                }
 
-               const finalAnswers = [];
-               for (let x = 0; x < answers.length; x++) {
-                    finalAnswers.push({ answer: answers[x].answer, points: answers[x].points });
-               }
+               this.question.prepare();
 
-               if (this.question.statement.trim().indexOf("10") === 0) {
-                    this.question.statement = this.question.statement.trim().substr(2);
-               }
-
-               this.submitting = true;
-
-               db.collection("questions")
-                    .add(this.question)
-                    .then(() => {
+               this.question.submit({
+                    onSuccess: () => {
+                         this.question.resetAnswers();
+                         this.question.resetStatement();
+                         this.hideAlert();
                          this.showSuccess();
                          this.submitting = false;
-                         this.question = {
-                              statement: "",
-                              topic: this.question.topic,
-                              language: this.question.language,
-                              answers: [
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                              ],
-                         };
-                         document.getElementById("send-btn").disabled = false;
-                    });
+                    },
+                    onFailure: (e) => {
+                         alert("Something wrong happened: ", e);
+                         this.question.resetAnswers();
+                         this.question.resetStatement();
+                         this.submitting = false;
+                    },
+               });
           },
      },
      created: function() {
-          db.collection("param").onSnapshot((snapshot) => {
-               const changes = snapshot.docChanges();
+          Question.retrieveData({
+               onSuccess: (data) => {
+                    this.topics = [...data.topics].sort((a, b) => a.localeCompare(b));
+                    this.question.topic = this.topics[0];
 
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         const data = { ...change.doc.data() };
-
-                         this.topics = [...data.topics].sort((a, b) => a.localeCompare(b));
-                         this.question.topic = this.topics[0];
-
-                         this.languages = data.languages;
-                         this.question.language = this.languages[0];
-                    }
-               });
+                    this.languages = data.languages;
+                    this.question.language = this.languages[0];
+               },
           });
      },
 };

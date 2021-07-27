@@ -26,8 +26,8 @@
 </template>
 
 <script>
-import db from "../Firebase";
 import QuestionCard from "../components/basic-components/QuestionCard.vue";
+import Question from "../models/Question";
 
 export default {
      name: "Search",
@@ -43,17 +43,10 @@ export default {
           };
      },
      created: function() {
-          db.collection("questions").onSnapshot((res) => {
-               const changes = res.docChanges();
-
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         this.list.push({
-                              ...change.doc.data(),
-                              id: change.doc.id,
-                         });
-                    }
-               });
+          Question.retrieveList({
+               onSuccess: (list) => {
+                    this.list = list;
+               },
           });
      },
      computed: {

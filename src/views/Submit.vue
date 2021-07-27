@@ -1,6 +1,6 @@
 <template>
      <div class="bg-dark main pt-5">
-          <Form />
+          <Form :questions="getQuestions" />
           <Search />
      </div>
 </template>
@@ -8,15 +8,26 @@
 <script>
 import Form from "../components/Form.vue";
 import Search from "../components/Search.vue";
+import Question from "../models/Question";
 
 export default {
      name: "Submit",
      components: { Form, Search },
-     props: {},
-     data() {
-          return {};
+     computed: {
+          getQuestions() {
+               return this.list;
+          },
      },
-     created() {},
+     data() {
+          return { list: [] };
+     },
+     created() {
+          Question.retrieveList({
+               onSuccess: (list) => {
+                    this.list = list;
+               },
+          });
+     },
 };
 </script>
 
