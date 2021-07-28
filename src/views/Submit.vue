@@ -1,32 +1,28 @@
 <template>
      <div class="bg-dark main pt-5">
-          <Form :questions="getQuestions" />
-          <Search />
+          <Form :list="getQuestions" :params="getParams" />
+          <Search :questions="getQuestions" />
      </div>
 </template>
 
 <script>
 import Form from "../components/Form.vue";
 import Search from "../components/Search.vue";
-import Question from "../models/Question";
 
 export default {
      name: "Submit",
      components: { Form, Search },
+     props: {
+          list: Array,
+          params: {},
+     },
      computed: {
           getQuestions() {
                return this.list;
           },
-     },
-     data() {
-          return { list: [] };
-     },
-     created() {
-          Question.retrieveList({
-               onSuccess: (list) => {
-                    this.list = list;
-               },
-          });
+          getParams() {
+               return this.params;
+          },
      },
 };
 </script>

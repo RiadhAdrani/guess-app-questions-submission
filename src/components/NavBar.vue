@@ -8,7 +8,7 @@
           </button>
           <button
                class="btn btn-dark nav-bar-btn p-3 border-light mx-md-3 mx-auto my-2"
-               v-on:click="goDashboard()"
+               v-on:click="goLogin()"
           >
                Dashboard
           </button>
@@ -18,16 +18,18 @@
           >
                About The App
           </button>
-          <router-link to="/dashboard">Dashboard</router-link>
      </div>
 </template>
 
 <script>
 export default {
      props: {
-          homeData: {},
-          dashboardData: {},
-          aboutData: {},
+          currentUser: String,
+     },
+     computed: {
+          getUser() {
+               return this.currentUser;
+          },
      },
      name: "NavBar",
      methods: {
@@ -35,13 +37,20 @@ export default {
                this.$router.push({ name: name, query: { redirect: path }, params: data });
           },
           goHome() {
-               this.redirectTo({ name: "Submit", path: "/", data: this.homeData });
+               this.redirectTo({ name: "Submit", path: "/" });
+          },
+          goLogin() {
+               if (this.getUser !== undefined) {
+                    this.goDashboard();
+               } else {
+                    this.redirectTo({ name: "Login", path: "/login" });
+               }
           },
           goDashboard() {
-               this.redirectTo({ name: "Login", path: "/login", data: this.dashboardData });
+               this.redirectTo({ name: "Dashboard", path: "/dashboard" });
           },
           goAbout() {
-               this.redirectTo({ name: "About", path: "/about", data: {} });
+               this.redirectTo({ name: "About", path: "/about" });
           },
      },
 };

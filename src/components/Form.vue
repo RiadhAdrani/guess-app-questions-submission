@@ -22,7 +22,7 @@
                     class="form-select p-2"
                     aria-label="Default select example"
                >
-                    <option v-for="t in topics" :key="t" v-bind:value="t"> {{ t }}</option>
+                    <option v-for="t in getTopics" :key="t" v-bind:value="t"> {{ t }}</option>
                </select>
           </div>
           <div class="m-5 d-flex flex-column flex-sm-row justify-content-center">
@@ -32,7 +32,7 @@
                     class="form-select p-2"
                     aria-label="Default select example"
                >
-                    <option v-for="l in languages" :key="l" v-bind:value="l"> {{ l }}</option>
+                    <option v-for="l in getLanguages" :key="l" v-bind:value="l"> {{ l }}</option>
                </select>
           </div>
 
@@ -98,10 +98,16 @@ import Question from "../models/Question";
 export default {
      name: "Form",
      components: { EditAnswer },
-     props: { questions: Array },
+     props: { list: Array, params: {} },
      computed: {
           getQuestions() {
-               return this.questions;
+               return this.list;
+          },
+          getTopics() {
+               return this.params.topics;
+          },
+          getLanguages() {
+               return this.params.languages;
           },
      },
      data() {
@@ -143,7 +149,7 @@ export default {
                this.hideAlert();
                this.hideSuccess();
 
-               switch (this.question.verify(this.questions)) {
+               switch (this.question.verify(this.getQuestions)) {
                     case Question.DUPLICATE:
                          this.showAlert("Question Already exists!");
                          return;
@@ -178,17 +184,6 @@ export default {
                     },
                });
           },
-     },
-     created: function() {
-          Question.retrieveData({
-               onSuccess: (data) => {
-                    this.topics = [...data.topics].sort((a, b) => a.localeCompare(b));
-                    this.question.topic = this.topics[0];
-
-                    this.languages = data.languages;
-                    this.question.language = this.languages[0];
-               },
-          });
      },
 };
 </script>

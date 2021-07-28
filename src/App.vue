@@ -1,8 +1,13 @@
 <template>
      <div class="bg-dark main pt-5">
           <Header />
-          <NavBar :homeData="{ db }" :dashboardData="{ db }" :aboutData="{}" />
-          <router-view />
+          <NavBar :currentUser="this.user" />
+          <router-view
+               @updateUser="updateUser"
+               :list="this.list"
+               :params="this.params"
+               :user="this.user"
+          />
           <Footer />
      </div>
 </template>
@@ -11,35 +16,54 @@
 import NavBar from "./components/NavBar.vue";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
-import db from "./Firebase";
+import Question from "./models/Question";
 
 export default {
      name: "App",
      components: { NavBar, Header, Footer },
+     computed: {
+          getParams() {
+               return this.params;
+          },
+          getList() {
+               return this.list;
+          },
+          getUser() {
+               return this.user;
+          },
+     },
      data() {
           return {
                list: [],
-               user: {},
+               params: {
+                    languages: [],
+                    topics: [],
+               },
+               user: undefined,
           };
      },
      created: function() {
-          db.collection("questions").onSnapshot((res) => {
-               const changes = res.docChanges();
-
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         this.list.push({
-                              ...change.doc.data(),
-                              id: change.doc.id,
-                         });
-                    }
-               });
-
-               this.$router.push({
-                    name: "Submit",
-                    query: { redirect: "/" },
-               });
+          Question.retrieveData({
+               onSuccess: (data) => {
+                    this.params.languages = data.languages;
+                    this.params.topics = [...data.topics].sort((a, b) => a.localeCompare(b));
+               },
           });
+
+          Question.retrieveList({
+               onSuccess: (list) => {
+                    this.list = list;
+                    this.$router.push({
+                         name: "Submit",
+                         query: { redirect: "/" },
+                    });
+               },
+          });
+     },
+     methods: {
+          updateUser(newUser) {
+               this.user = newUser;
+          },
      },
 };
 </script>

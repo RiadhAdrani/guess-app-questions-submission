@@ -3,7 +3,7 @@
           <h3 class="text-light mb-1">Search for a question</h3>
           <button type="button" class="btn btn-dark">
                There are only
-               <span class="badge bg-secondary mt-1 mx-1"> {{ list.length }} questions </span> in
+               <span class="badge bg-secondary mt-1 mx-1"> {{ getList.length }} questions </span> in
                our Database !
           </button>
 
@@ -27,7 +27,6 @@
 
 <script>
 import QuestionCard from "../components/basic-components/QuestionCard.vue";
-import Question from "../models/Question";
 
 export default {
      name: "Search",
@@ -42,20 +41,16 @@ export default {
                displayNumber: 5,
           };
      },
-     created: function() {
-          Question.retrieveList({
-               onSuccess: (list) => {
-                    this.list = list;
-               },
-          });
-     },
      computed: {
+          getList() {
+               return this.questions;
+          },
           filteredList() {
                if (!this.filter) {
-                    return this.list;
+                    return this.questions;
                }
                const l = [];
-               this.list.forEach((e) => {
+               this.questions.forEach((e) => {
                     if (e["statement"].toLowerCase().includes(this.filter.toLowerCase())) l.push(e);
                });
 

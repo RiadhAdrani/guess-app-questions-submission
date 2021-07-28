@@ -1,5 +1,5 @@
 import Answer from "./Answer";
-import db from "../Firebase";
+import db from "./Firebase";
 
 class Question {
      constructor({

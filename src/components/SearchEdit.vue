@@ -7,8 +7,10 @@
           <h3 class="text-light mb-1">Search for a question</h3>
           <button type="button" class="btn btn-dark">
                There are only
-               <span class="badge bg-secondary mt-1 mx-1"> {{ list.length }} questions </span> in
-               our Database !
+               <span class="badge bg-secondary mt-1 mx-1">
+                    {{ getQuestions.length }} questions
+               </span>
+               in our Database !
           </button>
 
           <div class="d-flex flex-md-row flex-column">
@@ -54,9 +56,9 @@
      <div class="edit-view text-light mb-5" id="edit-view" v-if="isEditMode">
           <EditQuestion
                :update="question"
-               :languages="languages"
+               :languages="getLanguages"
                :question="question"
-               :topics="topics"
+               :topics="getTopics"
                @add="addAnswer"
                @remove="removeAnswer"
                @reset="resetAnswers"
@@ -77,35 +79,29 @@ export default {
      components: { QuestionCardEdit, EditQuestion },
      data() {
           return {
-               list: [],
                filter: "",
                filterByTopic: "All",
                displayNumber: 5,
-               topics: [],
                editMode: false,
-               languages: [],
-               //eID: "",
                question: new Question({}),
           };
      },
-     created: function() {
-          Question.retrieveList({
-               onSuccess: (data) => {
-                    this.list = data;
-                    // this.eID = this.list[0].id;
-               },
-          });
-
-          Question.retrieveData({
-               onSuccess: (param) => {
-                    this.topics = [...param.topics].sort((a, b) => a.localeCompare(b));
-                    this.languages = param.languages;
-               },
-          });
+     props: {
+          questions: Array,
+          params: {},
      },
      computed: {
+          getLanguages() {
+               return this.params.languages;
+          },
+          getTopics() {
+               return this.params.topics;
+          },
+          getQuestions() {
+               return this.questions;
+          },
           filteredList() {
-               return this.list.filter((e) => {
+               return this.questions.filter((e) => {
                     return (
                          (e["statement"].toLowerCase().includes(this.filter.toLowerCase()) &&
                               (this.filterByTopic === "All" || e.topic === this.filterByTopic)) ||
@@ -117,11 +113,11 @@ export default {
                return this.editMode;
           },
      },
+
      methods: {
           getQuestionIndexById(id) {
-               for (let e in this.list) {
-                    if (this.list[e].id === id) {
-                         // this.eID = id;
+               for (let e in this.getQuestions) {
+                    if (this.getQuestions[e].id === id) {
                          return e;
                     }
                }
@@ -137,7 +133,7 @@ export default {
           },
           EditQuestion(id) {
                if (this.getQuestionIndexById(id) !== -1) {
-                    const q = this.list[this.getQuestionIndexById(id)];
+                    const q = this.getQuestions[this.getQuestionIndexById(id)];
                     this.question = Question.fromJSON(q);
                     this.EnterEditMode();
                } else {

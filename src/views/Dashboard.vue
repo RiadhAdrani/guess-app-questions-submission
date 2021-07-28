@@ -4,7 +4,7 @@
      >
           <h2 class="text-light">Dashboard</h2>
           <div class="">
-               <SearchEdit />
+               <SearchEdit :questions="getList" :params="getParams" />
           </div>
      </div>
 </template>
@@ -15,5 +15,26 @@ import SearchEdit from "../components/SearchEdit.vue";
 export default {
      name: "Dashboard",
      components: { SearchEdit },
+     props: {
+          user: String,
+          list: Array,
+          params: {},
+     },
+     computed: {
+          getList() {
+               return this.list;
+          },
+          getParams() {
+               return this.params;
+          },
+     },
+     created() {
+          if (this.user === undefined) {
+               this.$router.push({
+                    name: "Login",
+                    query: { redirect: "/login" },
+               });
+          }
+     },
 };
 </script>
