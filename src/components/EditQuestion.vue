@@ -37,7 +37,7 @@
                          class="form-select p-2"
                          aria-label="Default select example"
                     >
-                         <option v-for="t in topics" :key="t" v-bind:value="t"> {{ t }}</option>
+                         <option v-for="t in getTopics" :key="t" v-bind:value="t"> {{ t }}</option>
                     </select>
                </div>
                <div class="m-5 d-flex flex-column flex-sm-row justify-content-center">
@@ -47,7 +47,9 @@
                          class="form-select p-2"
                          aria-label="Default select example"
                     >
-                         <option v-for="l in languages" :key="l" v-bind:value="l"> {{ l }}</option>
+                         <option v-for="l in getLanguages" :key="l" v-bind:value="l">
+                              {{ l }}</option
+                         >
                     </select>
                </div>
                <div class="form-floating d-flex flex-column justify-content-center mb-3">
@@ -82,17 +84,29 @@
 
 <script>
 import EditAnswers from "../components/basic-components/EditAnswers.vue";
+import Question from "../models/Question";
 
 export default {
      name: "QuestionCardEdit",
      components: { EditAnswers },
      props: {
-          question: Object,
+          question: Question,
           languages: Array,
           topics: Array,
      },
      created() {
           this.q = this.question;
+     },
+     computed: {
+          update() {
+               return this.question;
+          },
+          getLanguages() {
+               return this.languages;
+          },
+          getTopics() {
+               return this.topics;
+          },
      },
      methods: {
           add() {
@@ -114,11 +128,7 @@ export default {
                this.$emit("delete");
           },
      },
-     computed: {
-          update() {
-               return this.question;
-          },
-     },
+
      emits: ["add", "remove", "reset", "save", "cancel", "delete"],
 };
 </script>

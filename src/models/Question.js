@@ -155,12 +155,39 @@ class Question {
           }
 
           for (let e; e < list.length; e++) {
-               if (this.statement.trim() === list[e].statement.trim()) {
+               if (this.statement.trim() === list[e].statement.trim() && this.id !== list[e].id) {
                     return Question.DUPLICATE;
                }
           }
 
           return Question.GOOD;
+     }
+
+     onVerify({
+          list = [],
+          onDuplicateQuestion = () => {},
+          onShortQuestionStatement = () => {},
+          onShortAnswer = () => {},
+          onDuplicateAnswer = () => {},
+          onValidSubmission = () => {},
+     }) {
+          switch (this.verify(list)) {
+               case Question.DUPLICATE:
+                    onDuplicateQuestion();
+                    return;
+               case Question.SHORT_STATEMENT:
+                    onShortQuestionStatement();
+                    return;
+               case Question.SHORT_ANSWER:
+                    onShortAnswer();
+                    return;
+               case Question.DUPLICATE_ANSWER:
+                    onDuplicateAnswer();
+                    return;
+               case Question.GOOD:
+                    onValidSubmission();
+                    return;
+          }
      }
 
      static getQuestionIndexByID(id, list) {
@@ -188,31 +215,27 @@ class Question {
 
      static retrieveList({ onSuccess }) {
           db.collection("questions").onSnapshot((res) => {
-               const changes = res.docChanges();
                const list = [];
 
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         if (change.doc.data().answers !== undefined) {
-                              list.push(
-                                   new Question({
-                                        statement: change.doc.data().statement,
-                                        topic: change.doc.data().topic,
-                                        language: change.doc.data().language,
-                                        answers: change.doc.data().answers.map(
-                                             (e) =>
-                                                  new Answer({
-                                                       answer: e.answer,
-                                                       points: e.points,
-                                                  })
-                                        ),
-                                        lastModified: change.doc.data().lastModified,
-                                        id: change.doc.id,
-                                   })
-                              );
-                         }
-                    }
+               res.docs.forEach((e) => {
+                    list.push(
+                         new Question({
+                              statement: e.data().statement,
+                              topic: e.data().topic,
+                              language: e.data().language,
+                              answers: e.data().answers.map(
+                                   (e) =>
+                                        new Answer({
+                                             answer: e.answer,
+                                             points: e.points,
+                                        })
+                              ),
+                              lastModified: e.data().lastModified,
+                              id: e.id,
+                         })
+                    );
                });
+
                onSuccess(list);
           });
      }

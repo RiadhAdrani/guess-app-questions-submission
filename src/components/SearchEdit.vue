@@ -113,7 +113,6 @@ export default {
                return this.editMode;
           },
      },
-
      methods: {
           getQuestionIndexById(id) {
                for (let e in this.getQuestions) {
@@ -133,8 +132,9 @@ export default {
           },
           EditQuestion(id) {
                if (this.getQuestionIndexById(id) !== -1) {
-                    const q = this.getQuestions[this.getQuestionIndexById(id)];
-                    this.question = Question.fromJSON(q);
+                    this.question = Question.fromJSON(
+                         this.getQuestions[this.getQuestionIndexById(id)]
+                    );
                     this.EnterEditMode();
                } else {
                     alert("An Error Occured...");
@@ -153,23 +153,46 @@ export default {
                this.ExitEditMode();
           },
           save() {
-               this.question.save({
-                    onSuccess: () => {
-                         this.ExitEditMode();
-                         alert("Question Updated!");
+               this.question.updateLastModified();
+               this.question.onVerify({
+                    list: this.questions,
+                    onDuplicateQuestion: () => {
+                         alert("No duplicate question allowed");
+                    },
+                    onShortQuestionStatement: () => {
+                         alert("Question is too short or empty! (3 characters min)");
+                    },
+                    onShortAnswer: () => {
+                         alert("A short or empty is not allowed! (2 characters min)");
+                    },
+                    onDuplicateAnswer: () => {
+                         alert("Duplicate answer detected!");
+                    },
+                    onValidSubmission: () => {
+                         this.question.save({
+                              onSuccess: () => {
+                                   this.ExitEditMode();
+                                   alert("Question Updated!");
+                              },
+                              onFailure: (e) => {
+                                   alert("Error saving updates: ", e);
+                              },
+                         });
                     },
                });
           },
           deleteQuestion() {
                if (confirm("Are you sure you want to delete this question?")) {
-                    this.question.wipe({
-                         onSuccess: () => {
-                              this.ExitEditMode();
-                         },
-                         onFailure: (e) => {
-                              alert("Error deleting Question: ", e);
-                         },
-                    });
+                    if (confirm("Are you really sure you want to do this?")) {
+                         this.question.wipe({
+                              onSuccess: () => {
+                                   this.ExitEditMode();
+                              },
+                              onFailure: (e) => {
+                                   alert("Error deleting Question: ", e);
+                              },
+                         });
+                    }
                }
           },
           Redirect() {
