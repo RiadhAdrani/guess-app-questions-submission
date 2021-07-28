@@ -4,6 +4,7 @@
      >
           <h2 class="text-light">Dashboard</h2>
           <div class="">
+               <EditLanguages :params="getParams" />
                <SearchEdit :questions="getList" :params="getParams" />
           </div>
      </div>
@@ -11,10 +12,11 @@
 
 <script>
 import SearchEdit from "../components/SearchEdit.vue";
+import EditLanguages from "../components/EditLanguages.vue";
 
 export default {
      name: "Dashboard",
-     components: { SearchEdit },
+     components: { SearchEdit, EditLanguages },
      props: {
           user: String,
           list: Array,
@@ -27,14 +29,18 @@ export default {
           getParams() {
                return this.params;
           },
+          cloneParams() {
+               return JSON.parse(JSON.stringify(this.params));
+          },
      },
      created() {
+          /*
           if (this.user === undefined) {
                this.$router.push({
                     name: "Login",
                     query: { redirect: "/login" },
                });
-          }
+          }*/
      },
 };
 </script>
