@@ -22,7 +22,7 @@
                     class="form-select p-2"
                     aria-label="Default select example"
                >
-                    <option v-for="t in topics" :key="t" v-bind:value="t"> {{ t }}</option>
+                    <option v-for="t in getTopics" :key="t" v-bind:value="t"> {{ t }}</option>
                </select>
           </div>
           <div class="m-5 d-flex flex-column flex-sm-row justify-content-center">
@@ -32,38 +32,16 @@
                     class="form-select p-2"
                     aria-label="Default select example"
                >
-                    <option v-for="l in languages" :key="l" v-bind:value="l"> {{ l }}</option>
+                    <option v-for="l in getLanguages" :key="l" v-bind:value="l"> {{ l }}</option>
                </select>
           </div>
 
           <div class="form-floating d-flex flex-column justify-content-center mb-3">
                <h3 class="text-light">Answers</h3>
                <p class="text-light">At least 10 answers should be provided</p>
-               <div
-                    v-for="answer in question.answers"
-                    :key="answer"
-                    class="col-12 w-75 mb-md-2 mb-4 align-self-center d-flex flex-column flex-md-row"
-               >
-                    <input
-                         type="text"
-                         v-model="answer.answer"
-                         class="form-control p-3 mb-2 mr-3 my-auto responsiveAnswer"
-                         placeholder="Answer..."
-                    />
-                    <div class="d-flex flex-row my-auto px-0 col-md-4 col-12">
-                         <p class="text-light my-auto ml-auto mr-2 ">Points:</p>
-                         <select
-                              v-model="answer.points"
-                              class="form-select d-inline-flex"
-                              aria-label="Default select example"
-                         >
-                              <option value="-5"> -5</option>
-                              <option selected value="1"> 1</option>
-                              <option value="2"> 2</option>
-                              <option value="5"> 5</option>
-                         </select>
-                    </div>
-               </div>
+
+               <EditAnswer :answers="question.answers" />
+
                <div class="d-flex flex-row justify-content-center">
                     <button
                          type="button"
@@ -98,6 +76,7 @@
           <div class="d-flex flex-column ">
                <button
                     class="btn btn-success d-inline align-self-center px-5"
+                    id="send-btn"
                     v-on:click="sendQuestion()"
                >
                     Submit
@@ -113,62 +92,49 @@
 </template>
 
 <script>
-import db from "../Firebase";
+import EditAnswer from "./basic-components/EditAnswers.vue";
+import Question from "../models/Question";
 
 export default {
      name: "Form",
+     components: { EditAnswer },
+     props: { list: Array, params: {} },
+     computed: {
+          getQuestions() {
+               return this.list;
+          },
+          getTopics() {
+               return this.params.topics;
+          },
+          getLanguages() {
+               return this.params.languages;
+          },
+     },
      data() {
           return {
                warning: "",
                languages: [],
                submitting: false,
                topics: [],
-               question: {
-                    statement: "",
-                    topic: "",
-                    language: "",
-                    answers: [
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                         { answer: "", points: 1 },
-                    ],
-               },
+               question: new Question({}),
           };
      },
      methods: {
           removeAnswer() {
-               if (this.question.answers.length > 10) {
-                    this.question.answers.pop();
-               }
+               this.question.removeAnswer();
           },
           addAnswer() {
-               this.question.answers.push({ answer: "", points: 1 });
+               this.question.addAnswer();
           },
           resetAnswers() {
-               this.question.answers = [
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-               ];
+               this.question.resetAnswers();
           },
           hideAlert() {
                document.getElementById("warning").style.display = "none";
           },
-          showAlert() {
+          showAlert(warning) {
+               this.warning = warning;
+               this.submitting = false;
                document.getElementById("warning").style.display = "inline";
           },
           hideSuccess() {
@@ -178,98 +144,46 @@ export default {
                document.getElementById("success").style.display = "inline";
           },
           sendQuestion() {
-               if (this.submitting) {
-                    console.log("a request has already been sent, please wait !");
-                    return;
-               }
+               if (this.submitting) return;
 
                this.hideAlert();
                this.hideSuccess();
 
-               const q = this.$data.question;
-
-               q.statement = q.statement.trim();
-
-               for (let a = 0; a < q.answers.length; a++) {
-                    q.answers[a].answer = q.answers[a].answer.trim();
-               }
-
-               if (!q.statement.trim()) {
-                    this.warning = "Question is empty or too short!";
-                    this.showAlert();
-                    return;
-               }
-
-               const answers = q.answers;
-
-               for (let x = 0; x < answers.length; x++) {
-                    if (answers[x].answer.trim().length < 2) {
-                         this.warning = "Answer cannot be empty or too short!";
-                         this.showAlert();
+               switch (this.question.verify(this.getQuestions)) {
+                    case Question.DUPLICATE:
+                         this.showAlert("Question Already exists!");
                          return;
-                    }
-
-                    for (let y = 0; y < answers.length; y++) {
-                         if (x !== y && answers[x].answer.trim() === answers[y].answer.trim()) {
-                              this.warning = "Cannot have duplicate answers";
-                              this.showAlert();
-                              return;
-                         }
-                    }
+                    case Question.SHORT_STATEMENT:
+                         this.showAlert("Question is too short or empty!");
+                         return;
+                    case Question.SHORT_ANSWER:
+                         this.showAlert("An answer is too short or empty!");
+                         return;
+                    case Question.DUPLICATE_ANSWER:
+                         this.showAlert("No duplicate answers are allowed!");
+                         return;
+                    case Question.GOOD:
+                         break;
                }
 
-               const finalAnswers = [];
-               for (let x = 0; x < answers.length; x++) {
-                    finalAnswers.push({ answer: answers[x].answer, points: answers[x].points });
-               }
+               this.question.prepare();
 
-               if (this.question.statement.trim().indexOf("10") === 0) {
-                    this.question.statement = this.question.statement.trim().substr(2);
-               }
-
-               this.submitting = true;
-
-               db.collection("questions")
-                    .add(this.question)
-                    .then(() => {
+               this.question.submit({
+                    onSuccess: () => {
+                         this.question.resetAnswers();
+                         this.question.resetStatement();
+                         this.hideAlert();
                          this.showSuccess();
                          this.submitting = false;
-                         this.question = {
-                              statement: "",
-                              topic: this.question.topic,
-                              language: this.question.language,
-                              answers: [
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                                   { answer: "", points: 1 },
-                              ],
-                         };
-                    });
-          },
-     },
-     created: function() {
-          db.collection("param").onSnapshot((snapshot) => {
-               const changes = snapshot.docChanges();
-
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         const data = { ...change.doc.data() };
-
-                         this.topics = [...data.topics].sort((a, b) => a.localeCompare(b));
-                         this.question.topic = this.topics[0];
-
-                         this.languages = data.languages;
-                         this.question.language = this.languages[0];
-                    }
+                    },
+                    onFailure: (e) => {
+                         alert("Something wrong happened: ", e);
+                         this.question.resetAnswers();
+                         this.question.resetStatement();
+                         this.submitting = false;
+                    },
                });
-          });
+          },
      },
 };
 </script>

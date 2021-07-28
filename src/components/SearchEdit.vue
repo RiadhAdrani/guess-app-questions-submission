@@ -1,306 +1,122 @@
 <template>
      <div
-          class="container col-12 p-5 flex-column justify-content-center search-view"
+          class="container col-12 p-1 flex-column justify-content-center search-view"
           id="search-view"
+          v-if="!isEditMode"
      >
           <h3 class="text-light mb-1">Search for a question</h3>
           <button type="button" class="btn btn-dark">
                There are only
-               <span class="badge bg-secondary mt-1 mx-1"> {{ list.length }} questions </span> in
-               our Database !
+               <span class="badge bg-secondary mt-1 mx-1">
+                    {{ getQuestions.length }} questions
+               </span>
+               in our Database !
           </button>
 
-          <input
-               type="search"
-               class="form-control mt-3"
-               placeholder="Search..."
-               aria-label="Search"
-               v-model="filter"
-          />
-
-          <div class="container mt-4 col-12 col-md-10">
-               <ul
-                    class="list-group container border border-light pb-1 mb-4 col-12"
-                    v-for="e in filteredList.slice(0, displayNumber)"
-                    :key="e.statement"
+          <div class="d-flex flex-md-row flex-column">
+               <input
+                    type="search"
+                    class="form-control mt-3 mb-md-3 mb-1"
+                    placeholder="Search..."
+                    aria-label="Search"
+                    v-model="filter"
+               />
+               <select
+                    v-model="displayNumber"
+                    class="form-select d-inline-flex my-md-3 my-1 ml-md-1 ml-0 col-md-2 col-12"
+                    aria-label="Default select example"
                >
-                    <div>
-                         <li
-                              class="bg-dark mx-auto py-3 px-4 text-light d-flex flex-lg-row flex-column justify-content-between"
-                         >
-                              <p
-                                   class="text-center text-md-start my-auto d-flex flex-wrap flex-grow-1 fs-3"
-                              >
-                                   Name 10 {{ e.statement }}
-                                   <span
-                                        ><button
-                                             class="btn btn-danger py-1 px-3 mx-md-3 mx-0"
-                                             v-on:click="EditQuestion(e.id)"
-                                        >
-                                             Edit
-                                        </button></span
-                                   >
-                              </p>
-                         </li>
-                    </div>
-                    <p
-                         class="d-flex flex-row flex-md-row flex-wrap my-auto justify-content-start justify-content-md-end ml-2"
-                    >
-                         <span
-                              class="input-group-text bg-primary btn text-light m-1 align-self-center"
-                              >{{ e.answers.length }}</span
-                         ><span
-                              class="input-group-text bg-primary btn text-light m-1 align-self-center"
-                              >{{ e.topic }}</span
-                         >
-                         <span
-                              class="input-group-text bg-primary btn text-light m-1 align-self-center text-break overflow-hidden"
-                              >{{ e.id }}</span
-                         >
-                    </p>
-                    <div class="d-flex flex-md-row flex-column flex-wrap bg-dark p-3">
-                         <div
-                              class="d-inline justify-content-start"
-                              v-for="a in e.answers"
-                              :key="a.answer"
-                         >
-                              <p
-                                   class="list-group-item my-1 mx-1 rounded d-dm-inline-flex d-flex text-center justify-content-between flex-direction-row text-left"
-                              >
-                                   <span class="my-auto text-left">{{ a.answer }}</span>
-                                   <span class="border border-dark p-1 px-2 ml-3 rounded">
-                                        {{ a.points }}</span
-                                   >
-                              </p>
-                         </div>
-                    </div>
-               </ul>
+                    <option selected value="5"> 5</option>
+                    <option value="10"> 10</option>
+                    <option value="20"> 20</option>
+                    <option value="30"> 30</option>
+               </select>
+               <select
+                    v-model="filterByTopic"
+                    class="form-select d-none my-md-3 my-1 ml-md-1 ml-0 col-md-2 col-12 mb-md-3 mb-2"
+                    aria-label="Default select example"
+               >
+                    <option value="All" key="all"> All</option>
+                    <option v-for="t in topics" :key="t" v-bind:value="t"> {{ t }}</option>
+               </select>
+          </div>
+
+          <div v-for="e in filteredList.slice(0, displayNumber)" :key="filteredList.indexOf(e)">
+               <QuestionCardEdit
+                    :question="e"
+                    :onEdit="
+                         function() {
+                              EditQuestion(e.id);
+                         }
+                    "
+               />
           </div>
      </div>
 
-     <div class="edit-view text-light" id="edit-view">
-          <div class="mt-4 col-12">
-               <div class="form-floating mt-5 mb-3">
-                    <div class="input-group mb-3">
-                         <span class="input-group-text" id="basic-addon3">Name 10</span>
-                         <input
-                              type="text"
-                              v-model="question.statement"
-                              maxlength="200"
-                              class="form-control"
-                              placeholder="things that you like."
-                              aria-describedby="basic-addon3"
-                         />
-                    </div>
-               </div>
-               <div class="m-5 d-flex flex-column flex-sm-row justify-content-center">
-                    <h3 class="text-light mr-sm-5">Topic</h3>
-                    <select
-                         v-model="question.topic"
-                         class="form-select p-2"
-                         aria-label="Default select example"
-                    >
-                         <option v-for="t in topics" :key="t" v-bind:value="t"> {{ t }}</option>
-                    </select>
-               </div>
-               <div class="m-5 d-flex flex-column flex-sm-row justify-content-center">
-                    <h3 class="text-light mr-sm-5">Language</h3>
-                    <select
-                         v-model="question.language"
-                         class="form-select p-2"
-                         aria-label="Default select example"
-                    >
-                         <option v-for="l in languages" :key="l" v-bind:value="l"> {{ l }}</option>
-                    </select>
-               </div>
-               <div class="form-floating d-flex flex-column justify-content-center mb-3">
-                    <div
-                         v-for="answer in question.answers"
-                         :key="answer"
-                         class="col-12 w-75 mb-md-2 mb-4 align-self-center d-flex flex-column flex-md-row"
-                    >
-                         <input
-                              type="text"
-                              v-model="answer.answer"
-                              class="form-control p-3 mb-2 mr-3 my-auto responsiveAnswer"
-                              placeholder="Answer..."
-                         />
-                         <div class="d-flex flex-row my-auto px-0 col-md-4 col-12">
-                              <p class="text-light my-auto ml-auto mr-2 ">Points:</p>
-                              <select
-                                   v-model="answer.points"
-                                   class="form-select d-inline-flex"
-                                   aria-label="Default select example"
-                              >
-                                   <option value="-5"> -5</option>
-                                   <option selected value="1"> 1</option>
-                                   <option value="2"> 2</option>
-                                   <option value="5"> 5</option>
-                              </select>
-                         </div>
-                    </div>
-                    <div class="d-flex flex-row justify-content-center">
-                         <button
-                              type="button"
-                              class="btn btn-primary d-inline align-self-center px-4 m-2"
-                              v-on:click="addAnswer()"
-                         >
-                              Add Answer
-                         </button>
-                         <button
-                              type="button"
-                              class="btn btn-warning d-inline align-self-center px-4 m-2"
-                              v-on:click="removeAnswer()"
-                         >
-                              Remove Answer
-                         </button>
-                    </div>
-
-                    <button
-                         type="button"
-                         class="btn btn-secondary d-inline align-self-center mt-2 px-5"
-                         v-on:click="resetAnswers()"
-                    >
-                         Reset Answers
-                    </button>
-               </div>
-          </div>
-          <div class="bg-secondary container rounded py-4">
-               <div>
-                    <li
-                         class="mx-auto py-3 px-4 text-light d-flex flex-lg-row flex-column justify-content-between"
-                    >
-                         <p
-                              class="text-center text-md-start my-auto d-flex flex-wrap flex-grow-1 fs-3"
-                         >
-                              Name 10 {{ question.statement }}
-                         </p>
-
-                         <button class="btn btn-success py-1 px-3 mx-md-3 my-2 mx-0">
-                              Save
-                         </button>
-                         <button
-                              class="btn btn-dark py-1 px-3 mx-md-3 my-2 mx-0"
-                              v-on:click="ExitEditMode()"
-                         >
-                              Cancel
-                         </button>
-                    </li>
-               </div>
-               <p
-                    class="d-flex flex-row flex-md-row flex-wrap my-auto justify-content-start justify-content-md-end ml-2"
-               >
-                    <span
-                         class="input-group-text bg-primary btn text-light m-1 align-self-center"
-                         >{{ question.topic }}</span
-                    >
-                    <span
-                         class="input-group-text bg-primary btn text-light m-1 align-self-center"
-                         >{{ question.answers.length }}</span
-                    >
-                    <span
-                         class="input-group-text bg-primary btn text-light m-1 align-self-center text-break overflow-hidden"
-                         >{{ question.id }}</span
-                    >
-               </p>
-               <div class="d-flex flex-md-row flex-column flex-wrap p-3">
-                    <div
-                         class="d-inline justify-content-start"
-                         v-for="a in question.answers"
-                         :key="a.answer"
-                    >
-                         <p
-                              class="list-group-item my-1 mx-1 rounded d-dm-inline-flex d-flex text-center justify-content-between flex-direction-row text-left"
-                         >
-                              <span class="my-auto text-left">{{ a.answer }}</span>
-                              <span class="border border-dark p-1 px-2 ml-3 rounded">
-                                   {{ a.points }}</span
-                              >
-                         </p>
-                    </div>
-               </div>
-          </div>
+     <div class="edit-view text-light mb-5" id="edit-view" v-if="isEditMode">
+          <EditQuestion
+               :update="question"
+               :languages="getLanguages"
+               :question="question"
+               :topics="getTopics"
+               @add="addAnswer"
+               @remove="removeAnswer"
+               @reset="resetAnswers"
+               @cancel="cancel"
+               @save="save"
+               @delete="deleteQuestion"
+          />
      </div>
 </template>
 
 <script>
-import db from "../Firebase";
+import QuestionCardEdit from "../components/basic-components/QuestionCardEdit.vue";
+import EditQuestion from "../components/EditQuestion.vue";
+import Question from "../models/Question";
 
 export default {
      name: "SearchEdit",
+     components: { QuestionCardEdit, EditQuestion },
      data() {
           return {
-               list: [],
                filter: "",
+               filterByTopic: "All",
                displayNumber: 5,
-               topics: [],
-               languages: [],
-               eID: "",
-               question: {
-                    statement: "question",
-                    topic: "topic",
-                    id: "id lol",
-                    answers: [
-                         { answer: "Answer", points: "1" },
-                         { answer: "Answer 2", points: "-5" },
-                    ],
-               },
+               editMode: false,
+               question: new Question({}),
           };
      },
-     created: function() {
-          db.collection("questions").onSnapshot((res) => {
-               const changes = res.docChanges();
-
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         this.list.push({
-                              ...change.doc.data(),
-                              id: change.doc.id,
-                         });
-
-                         this.eID = this.list[0].id;
-                    }
-               });
-          });
-
-          db.collection("param").onSnapshot((snapshot) => {
-               const changes = snapshot.docChanges();
-
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         const data = { ...change.doc.data() };
-
-                         this.topics = [...data.topics].sort((a, b) => a.localeCompare(b));
-
-                         this.languages = data.languages;
-                    }
-               });
-          });
+     props: {
+          questions: Array,
+          params: {},
      },
      computed: {
+          getLanguages() {
+               return this.params.languages;
+          },
+          getTopics() {
+               return this.params.topics;
+          },
+          getQuestions() {
+               return this.questions;
+          },
           filteredList() {
-               if (!this.filter) {
-                    return this.list;
-               }
-               const l = [];
-               this.list.forEach((e) => {
-                    if (e["statement"].toLowerCase().includes(this.filter.toLowerCase())) l.push(e);
+               return this.questions.filter((e) => {
+                    return (
+                         (e["statement"].toLowerCase().includes(this.filter.toLowerCase()) &&
+                              (this.filterByTopic === "All" || e.topic === this.filterByTopic)) ||
+                         !this.filter
+                    );
                });
-
-               const final = [];
-               for (let x = 0; x < this.displayNumber; x++) {
-                    if (l.length < x) break;
-                    else final.push(l[x]);
-               }
-
-               return l;
+          },
+          isEditMode() {
+               return this.editMode;
           },
      },
      methods: {
           getQuestionIndexById(id) {
-               for (let e in this.list) {
-                    if (this.list[e].id === id) {
-                         this.eID = id;
+               for (let e in this.getQuestions) {
+                    if (this.getQuestions[e].id === id) {
                          return e;
                     }
                }
@@ -308,46 +124,79 @@ export default {
                return -1;
           },
           EnterEditMode() {
-               document.getElementById("search-view").style.display = "none";
-               document.getElementById("edit-view").style.display = "inline-block";
+               this.editMode = true;
           },
           ExitEditMode() {
-               document.getElementById("search-view").style.display = "flex";
-               document.getElementById("edit-view").style.display = "none";
+               this.editMode = false;
+               this.Redirect();
           },
           EditQuestion(id) {
-               console.log("executing");
                if (this.getQuestionIndexById(id) !== -1) {
-                    const q = this.list[this.getQuestionIndexById(id)];
-
-                    this.question = JSON.parse(JSON.stringify(q));
-
+                    this.question = Question.fromJSON(
+                         this.getQuestions[this.getQuestionIndexById(id)]
+                    );
                     this.EnterEditMode();
                } else {
                     alert("An Error Occured...");
                }
           },
-          removeAnswer() {
-               if (this.question.answers.length > 10) {
-                    this.question.answers.pop();
+          removeAnswer: function() {
+               this.question.removeAnswer();
+          },
+          addAnswer: function() {
+               this.question.addAnswer();
+          },
+          resetAnswers: function() {
+               this.question.resetAnswers;
+          },
+          cancel() {
+               this.ExitEditMode();
+          },
+          save() {
+               this.question.updateLastModified();
+               this.question.onVerify({
+                    list: this.questions,
+                    onDuplicateQuestion: () => {
+                         alert("No duplicate question allowed");
+                    },
+                    onShortQuestionStatement: () => {
+                         alert("Question is too short or empty! (3 characters min)");
+                    },
+                    onShortAnswer: () => {
+                         alert("A short or empty is not allowed! (2 characters min)");
+                    },
+                    onDuplicateAnswer: () => {
+                         alert("Duplicate answer detected!");
+                    },
+                    onValidSubmission: () => {
+                         this.question.save({
+                              onSuccess: () => {
+                                   this.ExitEditMode();
+                                   alert("Question Updated!");
+                              },
+                              onFailure: (e) => {
+                                   alert("Error saving updates: ", e);
+                              },
+                         });
+                    },
+               });
+          },
+          deleteQuestion() {
+               if (confirm("Are you sure you want to delete this question?")) {
+                    if (confirm("Are you really sure you want to do this?")) {
+                         this.question.wipe({
+                              onSuccess: () => {
+                                   this.ExitEditMode();
+                              },
+                              onFailure: (e) => {
+                                   alert("Error deleting Question: ", e);
+                              },
+                         });
+                    }
                }
           },
-          addAnswer() {
-               this.question.answers.push({ answer: "", points: 1 });
-          },
-          resetAnswers() {
-               this.question.answers = [
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-                    { answer: "", points: 1 },
-               ];
+          Redirect() {
+               this.$router.push({ name: "Dashboard", query: { redirect: "/dashboard/" } });
           },
      },
 };
@@ -360,6 +209,5 @@ export default {
 }
 #edit-view {
      width: 100%;
-     display: none;
 }
 </style>

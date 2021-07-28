@@ -1,17 +1,29 @@
 <template>
      <div class="bg-dark main pt-5">
-          <Form />
-          <Search />
-          <p class="text-light mt-3">Thank you for contributing!</p>
+          <Form :list="getQuestions" :params="getParams" />
+          <Search :questions="getQuestions" />
      </div>
 </template>
 
 <script>
-import Form from "../src/components/Form.vue";
-import Search from "../src/components/Search.vue";
+import Form from "../components/Form.vue";
+import Search from "../components/Search.vue";
 
 export default {
+     name: "Submit",
      components: { Form, Search },
+     props: {
+          list: Array,
+          params: {},
+     },
+     computed: {
+          getQuestions() {
+               return this.list;
+          },
+          getParams() {
+               return this.params;
+          },
+     },
 };
 </script>
 

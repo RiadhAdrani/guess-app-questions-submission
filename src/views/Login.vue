@@ -23,6 +23,7 @@
                     <input
                          v-model="password"
                          type="password"
+                         autocomplete="your-current-password"
                          class="form-control"
                          id="exampleInputPassword1"
                     />
@@ -40,7 +41,7 @@
 </template>
 
 <script>
-import db from "../src/Firebase";
+import db from "../models/Firebase";
 
 export default {
      name: "Login",
@@ -71,7 +72,7 @@ export default {
 
                               try {
                                    if (data[this.user.trim()].password === this.password.trim()) {
-                                        this.OnSuccess();
+                                        this.OnSuccess(this.user.trim());
                                    } else {
                                         this.ShowFailedLogin(
                                              "There is no match for this combination in our database, please try again."
@@ -95,11 +96,23 @@ export default {
           HideFailedLogin() {
                document.getElementById("failed-login").style.display = "none";
           },
-          OnSuccess() {
+          OnSuccess(user) {
+               this.$emit("updateUser", user);
                this.Redirect();
           },
      },
-     created: function() {},
+     props: {
+          currentUser: String,
+     },
+     computed: {
+          getUser() {
+               if (this.currentUser) {
+                    this.Redirect();
+               }
+               return this.currentUser;
+          },
+     },
+     emits: ["updateUser"],
 };
 </script>
 

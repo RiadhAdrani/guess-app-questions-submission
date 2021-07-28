@@ -3,7 +3,7 @@
           <h3 class="text-light mb-1">Search for a question</h3>
           <button type="button" class="btn btn-dark">
                There are only
-               <span class="badge bg-secondary mt-1 mx-1"> {{ list.length }} questions </span> in
+               <span class="badge bg-secondary mt-1 mx-1"> {{ getList.length }} questions </span> in
                our Database !
           </button>
 
@@ -16,31 +16,24 @@
           />
 
           <div class="container mt-4">
-               <ul class="list-group" v-for="e in filteredList.slice(0, 10)" :key="e.statement">
-                    <li
-                         class="list-group-item mt-2 bg-secondary text-light d-flex flex-sm-row flex-column justify-content-between"
-                    >
-                         <p class="text-center text-sm-start my-auto">Name 10 {{ e.statement }}</p>
-                         <p class="d-flex flex-column flex-sm-row my-auto justify-content-end ml-2">
-                              <span
-                                   class="input-group-text w-100 bg-light text-dark m-1 align-self-center"
-                                   >{{ e.answers.length }}</span
-                              ><span
-                                   class="input-group-text w-100 bg-light text-dark m-1 align-self-center"
-                                   >{{ e.topic }}</span
-                              >
-                         </p>
-                    </li>
-               </ul>
+               <QuestionCard
+                    :question="e"
+                    v-for="e in filteredList.slice(0, 5)"
+                    :key="e.statement"
+               />
           </div>
      </div>
 </template>
 
 <script>
-import db from "../Firebase";
+import QuestionCard from "../components/basic-components/QuestionCard.vue";
 
 export default {
      name: "Search",
+     components: { QuestionCard },
+     props: {
+          questions: Array,
+     },
      data() {
           return {
                list: [],
@@ -48,27 +41,16 @@ export default {
                displayNumber: 5,
           };
      },
-     created: function() {
-          db.collection("questions").onSnapshot((res) => {
-               const changes = res.docChanges();
-
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         this.list.push({
-                              ...change.doc.data(),
-                              id: change.doc.id,
-                         });
-                    }
-               });
-          });
-     },
      computed: {
+          getList() {
+               return this.questions;
+          },
           filteredList() {
                if (!this.filter) {
-                    return this.list;
+                    return this.questions;
                }
                const l = [];
-               this.list.forEach((e) => {
+               this.questions.forEach((e) => {
                     if (e["statement"].toLowerCase().includes(this.filter.toLowerCase())) l.push(e);
                });
 
