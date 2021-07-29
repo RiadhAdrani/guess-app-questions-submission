@@ -29,9 +29,11 @@
                     />
                </div>
           </form>
+          <span class="fst-italic">Disconnect by simply exiting this tab.</span>
           <button v-on:click="Login()" class="btn btn-success px-5 my-3 w-50 align-self-center">
                Login
           </button>
+
           <div
                class="alert alert-danger my-3 align-self-center"
                id="failed-login"

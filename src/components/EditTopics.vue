@@ -2,42 +2,35 @@
      <div>
           <div class="col-12 py-2">
                <div
-                    v-for="l in languages"
-                    :key="languages.indexOf(l)"
+                    v-for="l in topics"
+                    :key="topics.indexOf(l)"
                     class="bg-secondary my-1 py-2 px-4 d-flex flex-row justify-content-between rounded"
                >
-                    <p class="my-auto">{{ l.language }}</p>
+                    <p class="my-auto">{{ l.topic }}</p>
                     <div class="d-flex flex-row justify-content-end">
                          <input
                               v-if="l.edit"
-                              v-model="languages[languages.indexOf(l)].language"
+                              v-model="topics[topics.indexOf(l)].topic"
                               class="mr-2"
                          />
                          <button
-                              v-if="!l.edit && !l.locked"
+                              v-if="!l.edit"
                               class="btn btn-danger"
-                              @click="edit(languages.indexOf(l))"
+                              @click="edit(topics.indexOf(l))"
                          >
                               Edit
-                         </button>
-                         <button v-if="l.locked" class="btn btn-info">
-                              Basic
                          </button>
                          <button v-if="l.edit" class="btn btn-primary mr-2" @click="save">
                               OK
                          </button>
-                         <button
-                              v-if="l.edit"
-                              class="btn btn-warning"
-                              @click="removeIt(l.language)"
-                         >
+                         <button v-if="l.edit" class="btn btn-warning" @click="removeIt(l.topic)">
                               Delete
                          </button>
                     </div>
                </div>
           </div>
           <button class="btn btn-primary mr-1" @click="add">Add</button>
-          <button class="btn btn-success ml-1" @click="updateDB">Save</button>
+          <button class="btn btn-success" @click="updateDB">Save</button>
      </div>
 </template>
 
@@ -45,48 +38,48 @@
 import db from "../models/Firebase";
 
 export default {
-     name: "EditLanguages",
+     name: "EditTopics",
      props: { params: Object },
      data() {
           return {
-               languages: [],
+               topics: [],
           };
      },
      created() {
-          this.languages = this.params.languages.map((l) => {
-               return { language: l, edit: false, locked: l === "English" };
+          this.topics = this.params.topics.map((l) => {
+               return { topic: l, edit: false };
           });
+          console.log(this.topics);
      },
      methods: {
           edit(index) {
-               this.languages.forEach((e) => {
+               this.topics.forEach((e) => {
                     e.edit = false;
                });
-               this.languages[index].edit = true;
+               this.topics[index].edit = true;
           },
           save() {
-               this.languages.forEach((e) => {
+               this.topics.forEach((e) => {
                     e.edit = false;
                });
           },
           removeIt(l) {
                if (confirm("Are you sure you want to delete this topic?")) {
                     if (confirm("Are you really sure you want to proceed?")) {
-                         this.languages = this.languages.filter((e) => e.language !== l);
+                         this.topics = this.topics.filter((e) => e.topic !== l);
                     }
                }
           },
           updateDB() {
-               for (let i = 0; i < this.languages.length; i++) {
-                    for (let j = 0; j < this.languages.length; j++) {
-                         console.log(this.languages[i].language, this.languages[j].language);
+               for (let i = 0; i < this.topics.length; i++) {
+                    for (let j = 0; j < this.topics.length; j++) {
                          if (
-                              this.languages[i].language.trim().toLowerCase() ===
-                                   this.languages[j].language.trim().toLowerCase() &&
+                              this.topics[i].topic.trim().toLowerCase() ===
+                                   this.topics[j].topic.trim().toLowerCase() &&
                               i !== j
                          ) {
                               alert(
-                                   `Duplicate entries: ${this.languages[i].language} at index ${i} and ${this.languages[j].language} at index ${j}`
+                                   `Duplicate entries: ${this.topics[i].topic} and ${this.topics[j].topic}`
                               );
                               return;
                          }
@@ -94,8 +87,8 @@ export default {
                }
 
                const data = {
-                    languages: this.languages.map((e) => e.language.trim()),
-                    topics: [...this.params.topics],
+                    topics: this.topics.map((e) => e.topic.trim()),
+                    languages: [...this.params.languages],
                };
 
                db.collection("param")
@@ -106,10 +99,10 @@ export default {
                     });
           },
           add() {
-               this.languages.forEach((e) => {
+               this.topics.forEach((e) => {
                     e.edit = false;
                });
-               this.languages.push({ language: "New", edit: true, locked: false });
+               this.topics.push({ topic: "New", edit: true });
           },
      },
 };

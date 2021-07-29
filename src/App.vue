@@ -43,7 +43,7 @@ export default {
           };
      },
      created: function() {
-          Question.retrieveData({
+          Question.retrieveParams({
                onSuccess: (data) => {
                     this.params.languages = data.languages;
                     this.params.topics = [...data.topics].sort((a, b) => a.localeCompare(b));

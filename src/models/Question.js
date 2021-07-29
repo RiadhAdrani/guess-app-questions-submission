@@ -200,17 +200,12 @@ class Question {
           return -1;
      }
 
-     static retrieveData({ onSuccess }) {
-          db.collection("param").onSnapshot((snapshot) => {
-               const changes = snapshot.docChanges();
-
-               changes.forEach((change) => {
-                    if (change.type === "added") {
-                         const data = { ...change.doc.data() };
-                         onSuccess(data);
-                    }
+     static retrieveParams({ onSuccess }) {
+          db.collection("param")
+               .doc("params")
+               .onSnapshot((snapshot) => {
+                    onSuccess(snapshot.data());
                });
-          });
      }
 
      static retrieveList({ onSuccess }) {

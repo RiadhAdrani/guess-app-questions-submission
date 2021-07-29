@@ -4,7 +4,6 @@
           id="search-view"
           v-if="!isEditMode"
      >
-          <h3 class="text-light mb-1">Search for a question</h3>
           <button type="button" class="btn btn-dark">
                There are only
                <span class="badge bg-secondary mt-1 mx-1">
