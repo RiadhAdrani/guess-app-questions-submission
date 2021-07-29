@@ -2,12 +2,7 @@
      <div class="bg-dark main pt-5">
           <Header />
           <NavBar :currentUser="this.user" />
-          <router-view
-               @updateUser="updateUser"
-               :list="this.list"
-               :params="this.params"
-               :user="this.user"
-          />
+          <router-view @login="login" :list="this.list" :params="this.params" :user="this.user" />
           <Footer />
      </div>
 </template>
@@ -16,7 +11,7 @@
 import NavBar from "./components/NavBar.vue";
 import Header from "./components/Header.vue";
 import Footer from "./components/Footer.vue";
-import Question from "./models/Question";
+import Utils from "./models/Util";
 
 export default {
      name: "App",
@@ -39,18 +34,19 @@ export default {
                     languages: [],
                     topics: [],
                },
+               users: [],
                user: undefined,
           };
      },
      created: function() {
-          Question.retrieveParams({
+          Utils.getParams({
                onSuccess: (data) => {
                     this.params.languages = data.languages;
                     this.params.topics = [...data.topics].sort((a, b) => a.localeCompare(b));
                },
           });
 
-          Question.retrieveList({
+          Utils.getQuestionsList({
                onSuccess: (list) => {
                     this.list = list;
                     this.$router.push({
@@ -59,10 +55,28 @@ export default {
                     });
                },
           });
+
+          Utils.getUsers({
+               onSuccess: (data) => {
+                    this.users = data;
+               },
+          });
      },
      methods: {
-          updateUser(newUser) {
-               this.user = newUser;
+          login(combination) {
+               if (this.users[combination.username]) {
+                    if (this.users[combination.username].password === combination.password) {
+                         this.user = combination.username;
+                         this.$router.push({
+                              name: "Dashboard",
+                              query: { redirect: "/dashboard/" },
+                         });
+                    } else {
+                         alert("Bad combination");
+                    }
+               } else {
+                    alert("Bad combination");
+               }
           },
      },
 };

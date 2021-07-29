@@ -43,8 +43,6 @@
 </template>
 
 <script>
-import db from "../models/Firebase";
-
 export default {
      name: "Login",
      data() {
@@ -64,31 +62,7 @@ export default {
                     return;
                }
 
-               this.HideFailedLogin();
-               db.collection("users").onSnapshot((res) => {
-                    const changes = res.docChanges();
-
-                    changes.forEach((change) => {
-                         if (change.type === "added") {
-                              const data = change.doc.data();
-
-                              try {
-                                   if (data[this.user.trim()].password === this.password.trim()) {
-                                        this.OnSuccess(this.user.trim());
-                                   } else {
-                                        this.ShowFailedLogin(
-                                             "There is no match for this combination in our database, please try again."
-                                        );
-                                   }
-                              } catch (e) {
-                                   console.log("Bad Combination");
-                                   this.ShowFailedLogin(
-                                        "There is no match for this combination in our database, please try again."
-                                   );
-                              }
-                         }
-                    });
-               });
+               this.$emit("login", { username: this.user, password: this.password });
           },
           ShowFailedLogin(text) {
                const warning = document.getElementById("failed-login");
@@ -97,10 +71,6 @@ export default {
           },
           HideFailedLogin() {
                document.getElementById("failed-login").style.display = "none";
-          },
-          OnSuccess(user) {
-               this.$emit("updateUser", user);
-               this.Redirect();
           },
      },
      props: {
@@ -114,7 +84,7 @@ export default {
                return this.currentUser;
           },
      },
-     emits: ["updateUser"],
+     emits: ["login"],
 };
 </script>
 
