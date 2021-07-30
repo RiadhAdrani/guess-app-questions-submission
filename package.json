@@ -16,7 +16,7 @@
     "vue": "^3.0.0",
     "vue-router": "^4.0.10"
   },
-  "homepage": "https://RiadhAdrani.github.io/guess-app-questions-submission",
+  "homepage": "https://RiadhAdrani.github.io/guess-app-questions-submission/",
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",

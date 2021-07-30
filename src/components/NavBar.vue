@@ -8,7 +8,7 @@
           </button>
           <button
                class="btn btn-dark nav-bar-btn p-3 border-light mx-md-3 mx-auto my-2"
-               v-on:click="goLogin()"
+               v-on:click="goDashboard()"
           >
                Dashboard
           </button>

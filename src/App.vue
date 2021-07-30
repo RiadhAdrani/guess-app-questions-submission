@@ -2,7 +2,13 @@
      <div class="bg-dark main pt-5">
           <Header />
           <NavBar :currentUser="this.user" />
-          <router-view @login="login" :list="this.list" :params="this.params" :user="this.user" />
+          <router-view
+               @login="login"
+               @admin="admin"
+               :list="this.list"
+               :params="this.params"
+               :user="this.user"
+          />
           <Footer />
      </div>
 </template>
@@ -63,6 +69,9 @@ export default {
           });
      },
      methods: {
+          admin() {
+               this.user = "top-admin";
+          },
           login(combination) {
                if (this.users[combination.username]) {
                     if (this.users[combination.username].password === combination.password) {
