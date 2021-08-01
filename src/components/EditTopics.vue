@@ -4,10 +4,12 @@
                <div
                     v-for="l in topics"
                     :key="topics.indexOf(l)"
-                    class="bg-secondary my-1 py-2 px-4 d-flex flex-row justify-content-between rounded"
+                    class="bg-secondary my-1 py-2 px-4 d-flex flex-md-row flex-wrap flex-column justify-content-between rounded"
                >
                     <p class="my-auto">{{ l.topic }}</p>
-                    <div class="d-flex flex-row justify-content-end">
+                    <div
+                         class="d-flex flex-row justify-content-md-end justify-content-center mt-md-0 mt-2"
+                    >
                          <input
                               v-if="l.edit"
                               v-model="topics[topics.indexOf(l)].topic"

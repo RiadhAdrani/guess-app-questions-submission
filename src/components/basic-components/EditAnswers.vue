@@ -1,6 +1,6 @@
 <template>
      <div
-          class="col-12 w-75 mb-md-2 mb-4 align-self-center d-flex flex-column flex-md-row"
+          class="col-12 col-md-8 mb-md-2 mb-4 align-self-center d-flex flex-column flex-md-row"
           v-for="answer in answers"
           v-bind:key="answers.indexOf(answer)"
      >

@@ -27,8 +27,9 @@
                >
                     <option selected value="5"> 5</option>
                     <option value="10"> 10</option>
-                    <option value="20"> 20</option>
-                    <option value="30"> 30</option>
+                    <option value="25"> 25</option>
+                    <option value="50"> 50</option>
+                    <option value="100"> 100</option>
                </select>
                <select
                     v-model="filterByTopic"
@@ -36,7 +37,7 @@
                     aria-label="Default select example"
                >
                     <option value="All" key="all"> All</option>
-                    <option v-for="t in topics" :key="t" v-bind:value="t"> {{ t }}</option>
+                    <option v-for="t in getTopics" :key="t" v-bind:value="t"> {{ t }}</option>
                </select>
           </div>
 

@@ -7,18 +7,31 @@
                our Database !
           </button>
 
-          <input
-               type="search"
-               class="form-control mt-3"
-               placeholder="Search..."
-               aria-label="Search"
-               v-model="filter"
-          />
+          <div class="d-flex flex-md-row flex-column">
+               <input
+                    type="search"
+                    class="form-control mt-3 mb-md-3 mb-1"
+                    placeholder="Search..."
+                    aria-label="Search"
+                    v-model="filter"
+               />
+               <select
+                    v-model="displayNumber"
+                    class="form-select d-inline-flex my-md-3 my-1 ml-md-1 ml-0 col-md-2 col-12"
+                    aria-label="Default select example"
+               >
+                    <option selected value="5"> 5</option>
+                    <option value="10"> 10</option>
+                    <option value="25"> 25</option>
+                    <option value="50"> 50</option>
+                    <option value="100"> 100</option>
+               </select>
+          </div>
 
           <div class="container mt-4">
                <QuestionCard
                     :question="e"
-                    v-for="e in filteredList.slice(0, 5)"
+                    v-for="e in filteredList.slice(0, displayNumber)"
                     :key="e.statement"
                />
           </div>
@@ -53,12 +66,6 @@ export default {
                this.questions.forEach((e) => {
                     if (e["statement"].toLowerCase().includes(this.filter.toLowerCase())) l.push(e);
                });
-
-               const final = [];
-               for (let x = 0; x < this.displayNumber; x++) {
-                    if (l.length < x) break;
-                    else final.push(l[x]);
-               }
 
                return l;
           },
