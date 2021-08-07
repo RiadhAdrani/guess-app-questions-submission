@@ -42,7 +42,6 @@ export default {
      name: "Dashboard",
      components: { SearchEdit, EditLanguages, EditTopics },
      created() {
-          console.log(this.currentUser);
           if (this.currentUser) return;
           const username = prompt("Enter username", "");
           const password = prompt(`Enter password for ${username}`, "");
